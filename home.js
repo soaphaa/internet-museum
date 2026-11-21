@@ -175,7 +175,7 @@ function drawWord(svg, text) {
     const rows = LETTERS[char];
     const group = document.createElementNS(SVG_NS, "g");
     group.setAttribute("class", "letter");
-    group.style.animationDelay = (0.4 + i * 0.09) + "s";
+    group.style.animationDelay = (0.2 + i * 0.045) + "s";
 
     drawPixels(group, rows, x);
     svg.appendChild(group);
@@ -197,7 +197,7 @@ drawCursor(get("perf-cursor"));
 
 /* ===== going from home to the ticket ===== */
 
-// slow fade out, swap pages, slow fade in
+// fade out, swap pages, fade in
 get("ticket-btn").onclick = () => {
   get("home").classList.add("fading");
 
@@ -209,16 +209,18 @@ get("ticket-btn").onclick = () => {
     requestAnimationFrame(() => {
       get("ticket-page").classList.add("shown");
     });
-  }, 1400); // same as the fade time in home.css
+  }, 700); // same as the fade time in home.css
 };
 
 
 /* ===== ticket details ===== */
 
-// today's date on the stub, ex. "NOV 20 –"
-const today = new Date();
-const month = today.toLocaleString("en-US", { month: "short" }).toUpperCase();
-get("t-date").innerHTML = month + " " + today.getDate() + " &ndash;<br>FOREVER";
+// stamps the ticket with the exact date + time the page was opened,
+// ex. "NOV 20, 2026" on top and "8:41 PM" under it
+const now = new Date();
+const month = now.toLocaleString("en-US", { month: "short" }).toUpperCase();
+const time = now.toLocaleString("en-US", { hour: "numeric", minute: "2-digit" });
+get("t-date").innerHTML = month + " " + now.getDate() + ", " + now.getFullYear() + "<br>" + time;
 
 // barcode: each number is how thick a bar is, bars alternate with gaps.
 // fixed pattern so it looks the same every time
@@ -315,14 +317,14 @@ function tearTicket() {
 
   fill.style.top = "0px";
   fill.style.height = "100%";
-  ticket.classList.add("started", "torn"); // stub drifts away slowly (home.css)
+  ticket.classList.add("started", "torn"); // stub drifts away (home.css)
 
   // let the stub finish fading, then fade the whole page out and go to the museum
   setTimeout(() => {
     get("ticket-page").classList.add("fading");
-  }, 3200);
+  }, 1500);
 
   setTimeout(() => {
     location.href = NEXT_PAGE;
-  }, 4600);
+  }, 2300);
 }
