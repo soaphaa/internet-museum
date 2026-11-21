@@ -1,0 +1,616 @@
+/*
+  My Internet Museum - home page + ticket
+  colours: dark maroon, white, gold, navy
+*/
+
+:root {
+  --maroon: #6e1423;
+  --maroon-dark: #4f0e19;
+  --gold: #c4a052;
+  --gold-light: #e2cf9f;
+  --navy: #1d2741;
+  --white: #ffffff;
+  --paper: #f8f5f0;   /* home background, a warm white */
+  --ticket: #fbf8f1;  /* ticket paper */
+
+  /* same spacing scale as the museum page */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+
+  /* fonts */
+  --pixel: "DotGothic16", monospace;
+  --script: "Imperial Script", cursive;
+  --times: "Times New Roman", "Tinos", Times, serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  background: var(--paper);
+  color: var(--navy);
+  overflow: hidden; /* frames hang off the edges, this stops sideways scrolling */
+}
+
+/* both pages fill the whole screen */
+.page {
+  position: fixed;
+  inset: 0;
+  transition: opacity 1.4s ease; /* the slow fade between pages */
+}
+
+.page.fading {
+  opacity: 0;
+}
+
+
+/* ===== frames ===== */
+
+/* each frame gets its spot from the --x --y --w --r variables in home.html */
+.frame {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  aspect-ratio: 4 / 3;
+  border: 12px solid var(--frame);
+  rotate: var(--r, 0deg);
+  box-shadow: 0 16px 32px rgba(29, 39, 65, 0.12);
+
+  /* fade in first, then bob up and down forever */
+  opacity: 0;
+  animation:
+    frame-in 1.6s ease var(--d, 0s) forwards,
+    float 9s ease-in-out calc(var(--d, 0s) + 1.6s) infinite;
+}
+
+/* thin inner line on the frame so it doesn't look flat */
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+}
+
+.frame.tall {
+  aspect-ratio: 3 / 4;
+}
+
+.frame.oval,
+.frame.oval::after,
+.frame.oval .art {
+  border-radius: 50%;
+}
+
+/* frame colours */
+.frame.gold   { --frame: var(--gold); }
+.frame.maroon { --frame: var(--maroon); }
+.frame.navy   { --frame: var(--navy); }
+.frame.white  { --frame: var(--white); }
+
+/* white frame needs a darker inner line or it disappears */
+.frame.white::after {
+  border-color: rgba(29, 39, 65, 0.12);
+}
+
+/* the picture area. empty for now, just a soft colour */
+.art {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-shadow: inset 0 2px 10px rgba(29, 39, 65, 0.12);
+}
+
+.art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* placeholder colours, kept close together so nothing pops too much */
+.tone-1 { background: #e6dfd5; }
+.tone-2 { background: #ddd5cc; }
+.tone-3 { background: #d6d9de; }
+.tone-4 { background: #e3d8d4; }
+
+@keyframes frame-in {
+  from { opacity: 0; scale: 0.96; }
+  to   { opacity: 1; scale: 1; }
+}
+
+@keyframes float {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -8px; }
+}
+
+
+/* ===== title in the middle ===== */
+
+.center {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* white blob behind the title, slowly changes shape */
+.blob {
+  position: absolute;
+  inset: -56px -88px;
+  z-index: -1;
+  background: var(--white);
+  border-radius: 58% 42% 55% 45% / 52% 60% 40% 48%;
+  box-shadow: 0 20px 60px rgba(29, 39, 65, 0.08);
+  animation: blob 16s ease-in-out infinite;
+}
+
+@keyframes blob {
+  0%, 100% { border-radius: 58% 42% 55% 45% / 52% 60% 40% 48%; }
+  50%      { border-radius: 45% 55% 42% 58% / 60% 46% 54% 40%; }
+}
+
+/* "MY INTERNET" pixel art */
+.wordmark {
+  width: min(560px, 78vw);
+  fill: var(--maroon);
+  shape-rendering: crispEdges; /* keeps the pixels sharp instead of blurry */
+}
+
+/* each letter pops in one at a time (delays are set in home.js) */
+.wordmark .letter {
+  opacity: 0;
+  animation: pop-in 0.01s steps(1) forwards;
+}
+
+@keyframes pop-in {
+  to { opacity: 1; }
+}
+
+/* "Museum" */
+.museum {
+  font-family: var(--times);
+  font-weight: 400;
+  font-size: clamp(56px, 8vw, 112px);
+  line-height: 1;
+  color: var(--maroon);
+  margin-top: var(--space-3); /* room for the big swash on the M */
+
+  opacity: 0;
+  animation: rise-in 1.4s ease 1.6s forwards;
+}
+
+.script-m {
+  font-family: var(--script);
+  font-size: 1.45em;
+  line-height: 0;
+  margin-right: -0.06em;
+}
+
+/* ticket button */
+.ticket-btn {
+  position: relative;
+  display: flex;
+  height: 48px;
+  margin-top: var(--space-1);
+  border: none;
+  background: var(--maroon);
+  color: var(--white);
+  font-family: var(--pixel);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease;
+
+  opacity: 0;
+  animation: rise-in 1.4s ease 2.4s forwards;
+}
+
+.ticket-btn:hover {
+  background: var(--maroon-dark);
+  transform: translateY(-3px) rotate(-1deg);
+}
+
+.ticket-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+
+.tb-main,
+.tb-stub {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+}
+
+.tb-stub {
+  padding: 0 var(--space-2);
+  border-left: 2px dashed var(--gold);
+  color: var(--gold-light);
+}
+
+/* little half circle cut-outs on the top and bottom, like a real ticket.
+   they're white circles that match the blob behind */
+.ticket-btn::before,
+.ticket-btn::after {
+  content: "";
+  position: absolute;
+  right: 78px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--white);
+}
+
+.ticket-btn::before { top: -7px; }
+.ticket-btn::after  { bottom: -7px; }
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ===== page 2: ticket ===== */
+
+#ticket-page {
+  background: var(--navy);
+  display: grid;
+  place-items: center;
+  opacity: 0; /* home.js adds .shown to fade it in */
+}
+
+#ticket-page.shown {
+  opacity: 1;
+}
+
+#ticket-page.shown.fading {
+  opacity: 0;
+}
+
+/*
+  everything on the ticket is sized in "em" so the whole ticket
+  scales from this one font-size. it's 46em wide, so this makes it
+  fit the screen on phones and caps it at 16px on big screens
+*/
+.ticket {
+  position: relative;
+  display: flex;
+  height: 17em;
+  font-size: min(16px, calc((100vw - 32px) / 46));
+  font-family: var(--times);
+  color: var(--navy);
+  touch-action: none; /* stops phones from scrolling while you drag */
+  user-select: none;
+}
+
+.ticket p {
+  line-height: 1;
+}
+
+/* left strip, main part and stub all share the ticket paper */
+.t-strip,
+.t-image,
+.t-title,
+.t-perf,
+.t-stub {
+  height: 100%;
+  background: var(--ticket);
+}
+
+.t-small {
+  font-size: 0.75em;
+  letter-spacing: 0.08em;
+}
+
+.t-big {
+  font-size: 1.6em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* side strip with sideways text */
+.t-strip {
+  width: 4em;
+  background: var(--gold);
+  writing-mode: vertical-rl;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.4em;
+  padding: 1em 0.8em;
+}
+
+/* picture spot */
+.t-image {
+  position: relative;
+  width: 16em;
+  background: #e4ddd2;
+  overflow: hidden;
+}
+
+.t-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* the two curved lines on the picture, like the inspo */
+.arc {
+  position: absolute;
+  top: 50%;
+  width: 5em;
+  height: 9em;
+  border: 0.25em solid var(--maroon);
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+/* only show the outer half of each circle */
+.arc-left {
+  left: 2em;
+  border-right-color: transparent;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.arc-right {
+  right: 2em;
+  border-left-color: transparent;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+/* "MY INTERNET MUSEUM" sideways */
+.t-title {
+  width: 8.5em;
+  writing-mode: vertical-rl;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 1.2em 1em;
+}
+
+.t-title .t-big {
+  font-size: 2.4em;
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* the dotted line between the main ticket and the stub */
+.t-perf {
+  position: relative;
+  width: 2em;
+  cursor: grab;
+}
+
+.t-perf:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* half circle notches at the top and bottom (same colour as the page) */
+.t-perf::before,
+.t-perf::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  background: var(--navy);
+}
+
+.t-perf::before { top: -1em; }
+.t-perf::after  { bottom: -1em; }
+
+.perf-line,
+.perf-fill {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+}
+
+.perf-line {
+  top: 1.4em;
+  bottom: 1.4em;
+  border-left: 0.15em dashed rgba(29, 39, 65, 0.45);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+/* gold line that grows as you drag. home.js sets the top + height */
+.perf-fill {
+  top: 0;
+  height: 0;
+  width: 0.2em;
+  background: var(--gold);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* the stub that tears off */
+.t-stub {
+  display: flex;
+  justify-content: space-between;
+  width: 15.5em;
+  padding: 1.4em 1.2em 1.4em 0.6em;
+  transition: transform 2.6s ease, opacity 2.6s ease;
+}
+
+.stub-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9em;
+}
+
+.t-date {
+  font-size: 1.05em;
+  line-height: 1.15 !important;
+  letter-spacing: 0.04em;
+}
+
+.t-logo {
+  font-size: 2.2em;
+  letter-spacing: 0.04em;
+  margin-top: auto;
+}
+
+.t-logo .script-m {
+  color: var(--maroon);
+  font-size: 1.3em;
+  margin-right: 0;
+}
+
+.t-tag {
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-top: -0.6em;
+}
+
+.t-price {
+  font-size: 0.7em;
+  letter-spacing: 0.06em;
+}
+
+/* barcode bars are made in home.js */
+.barcode {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 3.6em;
+}
+
+.barcode span {
+  display: block;
+  width: 100%;
+  background: var(--navy);
+}
+
+.barcode span.gap {
+  background: transparent;
+}
+
+/* torn: stub slowly drifts off and fades away */
+.ticket.torn .t-stub {
+  transform: translate(2.5em, 1.5em) rotate(7deg);
+  opacity: 0;
+}
+
+.ticket.torn .t-perf {
+  cursor: default;
+}
+
+
+/* ===== tear hint ===== */
+
+/* looks like a selected text box in canva: thin border with square corner handles */
+.select-box {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  left: 64.13%; /* lines up with the dotted line: 29.5em out of 46em */
+  translate: -50% 0;
+  white-space: nowrap;
+  padding: 0.5em 0.9em;
+  border: 1px solid var(--gold-light);
+  color: var(--white);
+  font-family: var(--pixel);
+  font-size: max(12px, 0.85em);
+  letter-spacing: 0.05em;
+  transition: opacity 0.6s ease;
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+.handle {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: var(--navy);
+  border: 1px solid var(--gold-light);
+}
+
+.handle.tl { top: -4px;    left: -4px; }
+.handle.tr { top: -4px;    right: -4px; }
+.handle.bl { bottom: -4px; left: -4px; }
+.handle.br { bottom: -4px; right: -4px; }
+
+/* pixel mouse that slides down the line to show what to do */
+.pixel-cursor {
+  shape-rendering: crispEdges;
+  fill: var(--navy);
+}
+
+.pixel-cursor .px-light {
+  fill: var(--white);
+}
+
+.perf-cursor {
+  position: absolute;
+  left: 55%;
+  top: 1em;
+  width: 1.3em;
+  pointer-events: none;
+  animation: demo-drag 2.8s ease-in-out infinite;
+}
+
+@keyframes demo-drag {
+  0%   { transform: translateY(0);    opacity: 0; }
+  15%  { opacity: 1; }
+  75%  { transform: translateY(12em); opacity: 1; }
+  100% { transform: translateY(12em); opacity: 0; }
+}
+
+/* once you start dragging, the hint and demo cursor go away */
+.ticket.started .select-box,
+.ticket.started .perf-cursor {
+  opacity: 0;
+  animation: none;
+}
+
+
+/* ===== phones ===== */
+
+@media (max-width: 720px) {
+  /* fewer frames so they don't cover the title */
+  .frame:nth-of-type(2),
+  .frame:nth-of-type(7),
+  .frame:nth-of-type(8) {
+    display: none;
+  }
+
+  .frame {
+    --w: 30vw !important;
+  }
+
+  .blob {
+    inset: -40px -32px;
+  }
+}
+
+/* turn off the moving stuff for people who have reduce motion on */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Internet Museum</title>
+
+  <!--
+    fonts:
+    DotGothic16     = pixel font for small text (closest free match to canva's dot mincho)
+    Imperial Script = the fancy "M" (stand-in for Parfumerie Script Pro)
+    Tinos           = backup for Times New Roman on phones that don't have it
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Imperial+Script&family=Tinos:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+
+  <!-- ========== PAGE 1: home ========== -->
+  <section class="page" id="home">
+
+    <!--
+      frames scattered around the edges.
+      to add a picture later, put an <img> inside the .art div, ex:
+        <div class="art"><img src="assets/frame-1.jpg" alt=""></div>
+      position/size/tilt are set with the --x --y --w --r variables on each frame
+    -->
+    <div class="frame gold" style="--x: -2%; --y: -7%; --w: 15vw; --r: -3deg; --d: 0.1s;">
+      <div class="art tone-1"><!-- assets/frame-1 --></div>
+    </div>
+
+    <div class="frame maroon" style="--x: 21%; --y: -6%; --w: 19vw; --r: 1.5deg; --d: 0.3s;">
+      <div class="art tone-2"><!-- assets/frame-2 --></div>
+    </div>
+
+    <div class="frame navy tall" style="--x: 74%; --y: -8%; --w: 13vw; --r: 2deg; --d: 0.5s;">
+      <div class="art tone-3"><!-- assets/frame-3 --></div>
+    </div>
+
+    <div class="frame white tall" style="--x: -3%; --y: 31%; --w: 15vw; --r: 2deg; --d: 0.2s;">
+      <div class="art tone-4"><!-- assets/frame-4 --></div>
+    </div>
+
+    <div class="frame gold oval tall" style="--x: 83%; --y: 30%; --w: 14vw; --r: -2deg; --d: 0.6s;">
+      <div class="art tone-2"><!-- assets/frame-5 --></div>
+    </div>
+
+    <div class="frame maroon" style="--x: 5%; --y: 72%; --w: 14vw; --r: -2deg; --d: 0.4s;">
+      <div class="art tone-3"><!-- assets/frame-6 --></div>
+    </div>
+
+    <div class="frame white" style="--x: 34%; --y: 82%; --w: 19vw; --r: 1deg; --d: 0.7s;">
+      <div class="art tone-1"><!-- assets/frame-7 --></div>
+    </div>
+
+    <div class="frame navy" style="--x: 64%; --y: 76%; --w: 16vw; --r: -1.5deg; --d: 0.5s;">
+      <div class="art tone-4"><!-- assets/frame-8 --></div>
+    </div>
+
+    <div class="frame gold tall" style="--x: 89%; --y: 74%; --w: 12vw; --r: 3deg; --d: 0.8s;">
+      <div class="art tone-1"><!-- assets/frame-9 --></div>
+    </div>
+
+    <!-- title + ticket button in the middle -->
+    <div class="center">
+      <div class="blob"></div>
+
+      <!-- "MY INTERNET" gets drawn in here as pixel art by home.js -->
+      <svg class="wordmark" id="wordmark" role="img" aria-label="My Internet"></svg>
+
+      <h1 class="museum"><span class="script-m">M</span>useum</h1>
+
+      <button class="ticket-btn" id="ticket-btn">
+        <span class="tb-main">ADMIT ONE</span>
+        <span class="tb-stub">No.001</span>
+      </button>
+    </div>
+  </section>
+
+
+  <!-- ========== PAGE 2: the ticket ========== -->
+  <section class="page" id="ticket-page" hidden>
+
+    <div class="ticket" id="ticket">
+
+      <!-- coloured side strip, text reads sideways -->
+      <div class="t-strip">
+        <p class="t-small">ADMIT ONE</p>
+        <p class="t-big">GUEST PASS</p>
+      </div>
+
+      <!-- picture spot. add <img src="assets/ticket.jpg" alt=""> in here later -->
+      <div class="t-image">
+        <span class="arc arc-left"></span>
+        <span class="arc arc-right"></span>
+      </div>
+
+      <div class="t-title">
+        <p class="t-small">MY</p>
+        <p class="t-big">INTERNET<br>MUSEUM</p>
+      </div>
+
+      <!-- the dotted line you drag along -->
+      <div class="t-perf" id="perf" tabindex="0" role="button" aria-label="Tear the ticket">
+        <span class="perf-line"></span>
+        <span class="perf-fill" id="perf-fill"></span>
+        <svg class="pixel-cursor perf-cursor" id="perf-cursor" aria-hidden="true"></svg>
+      </div>
+
+      <!-- the part that rips off -->
+      <div class="t-stub" id="stub">
+        <div class="stub-text">
+          <p class="t-date" id="t-date">NOV 20 &ndash;<br>FOREVER</p>
+          <p class="t-logo"><span class="script-m">M</span>IM</p>
+          <p class="t-tag">FROM SCREEN TO WALL</p>
+          <p class="t-price">$0 (TAX INCLUDED)</p>
+        </div>
+        <div class="barcode" id="barcode"></div>
+      </div>
+
+      <!-- instructions, styled like a selected text box in canva -->
+      <div class="select-box" id="tear-hint">
+        <span class="handle tl"></span><span class="handle tr"></span>
+        <span class="handle bl"></span><span class="handle br"></span>
+        drag down the dotted line
+      </div>
+    </div>
+
+  </section>
+
+  <script src="home.js"></script>
+</body>
+</html>
