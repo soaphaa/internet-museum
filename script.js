@@ -19,6 +19,10 @@ if (!SUPABASE_URL.startsWith("PASTE")) {
 const MAX_PIECES = 6;
 const PER_WALL = 3;
 
+// art on the walls gets pixelated. this is how many pixels wide each one is
+// (smaller = chunkier). clicking a piece still shows the full clear image
+const PIXELS_ACROSS = 16;
+
 // who's logged in vs whose museum we're looking at
 // (not always the same person, ex. visiting a friend's museum)
 let user = null;
@@ -193,11 +197,20 @@ function makeSlot(piece) {
     frame.className = "frame";
     frame.title = piece.title; // shows the title on hover
 
-    const img = document.createElement("img");
-    img.src = imageUrl(piece.image_path);
-    img.alt = piece.title;
+    // tiny canvas (16 x 21) that gets stretched to fill the frame.
+    // image-rendering: pixelated in style.css keeps the pixels sharp instead of blurry
+    const canvas = document.createElement("canvas");
+    canvas.width = PIXELS_ACROSS;
+    canvas.height = Math.round(PIXELS_ACROSS * 4 / 3); // frames are 3:4
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute("aria-label", piece.title);
 
-    frame.appendChild(img);
+    // draw it once the image has loaded
+    const img = new Image();
+    img.onload = () => drawPixelated(canvas, img);
+    img.src = imageUrl(piece.image_path);
+
+    frame.appendChild(canvas);
     frame.onclick = () => openPiece(piece);
     return frame;
   }
@@ -214,6 +227,20 @@ function makeSlot(piece) {
   const blank = document.createElement("div");
   blank.className = "slot";
   return blank;
+}
+
+
+// shrinks the image down onto the tiny canvas.
+// crops it like object-fit: cover, so it fills the frame without stretching
+function drawPixelated(canvas, img) {
+  const ctx = canvas.getContext("2d");
+  const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+  const w = img.width * scale;
+  const h = img.height * scale;
+
+  // "high" blends the colours properly when shrinking a big image this much
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
 }
 
 
@@ -509,6 +536,8 @@ for (const btn of document.querySelectorAll("[data-close]")) {
 }
 
 // clicking the blurry area outside a popup closes it too.
+// e.target is the dialog for BOTH the backdrop and the dialog's own padding,
+// so also check if the click was actually outside the box
 for (const dialog of document.querySelectorAll("dialog")) {
   dialog.onclick = (e) => {
     if (e.target !== dialog) return;

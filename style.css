@@ -1,7 +1,5 @@
 /*
   Internet Wall styles
-  colours, spacing and room size are all variables up top
-  so the whole look can be changed from one spot
 */
 
 :root {
@@ -17,7 +15,7 @@
   --text-soft: #5b5054;
   --line: rgba(43, 34, 37, 0.12); /* thin borders on inputs/buttons */
 
-  /* spacing scale. only use these for gaps + padding so everything lines up */
+  /* spacing scale*/
   --space-1: 8px;
   --space-2: 16px;
   --space-3: 24px;
@@ -25,7 +23,7 @@
 
   --radius: 16px;
 
-  /* room size: --w is how wide each wall is, --h is how tall */
+  /* room size*/
   --w: 300px;
   --h: 230px;
 }
@@ -35,7 +33,6 @@
   margin: 0;
 }
 
-/* without this, anything with display: flex ignores the hidden attribute */
 [hidden] {
   display: none !important;
 }
@@ -47,17 +44,12 @@ body {
   min-height: 100vh;
 }
 
-/* keyboard focus outline (only shows when tabbing, not clicking) */
+/* keyboard focus outline */
 :focus-visible {
   outline: 2px solid var(--maroon);
   outline-offset: 2px;
 }
 
-
-/* ===== glass ===== */
-
-/* see-through white + blur = the frosted glass look.
-   only really shows when there's something behind it (the room) */
 .glass {
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(16px);
@@ -79,11 +71,11 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px; /* pill shape */
+  border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--white);
   color: var(--text);
-  text-decoration: none; /* for the <a> that's styled like a button */
+  text-decoration: none;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -92,7 +84,7 @@ body {
   background: var(--sage-light);
 }
 
-/* the main action on each screen */
+
 .btn-main {
   background: var(--maroon);
   border-color: var(--maroon);
@@ -126,7 +118,6 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  /* less padding on the right since the buttons already have their own */
   padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
 }
 
@@ -184,7 +175,7 @@ body {
   transform: skewY(-30deg);
 }
 
-/* right wall slants down to the right, slightly darker so it looks like it's in shade */
+/* right wall slants down to the right, slightly darker so it looks like it in shade */
 .wall-right {
   left: var(--w);
   top: 0;
@@ -192,7 +183,7 @@ body {
   transform: skewY(30deg);
 }
 
-/* square -> rotate 45deg -> squish it vertically = isometric floor */
+/*isometric shape */
 .floor {
   position: absolute;
   width: calc(var(--w) * 1.4142);
@@ -203,7 +194,7 @@ body {
   transform: scaleY(0.577) rotate(45deg);
 }
 
-/* rug in the middle of the floor */
+/* TEMPORARY BEFORE I ADD A DRAWN FLOORING */
 .floor::before {
   content: "";
   position: absolute;
@@ -213,16 +204,16 @@ body {
 }
 
 
-/* ===== art on the walls ===== */
+/* ===== art ===== */
 
-/* frames and empty spots are the same size so nothing shifts around */
+/* frames and empty spots*/
 .frame,
 .slot {
   width: calc(var(--w) * 0.24);
   aspect-ratio: 3 / 4;
 }
 
-/* maroon frame with a thin white mat inside */
+/* maroon frame - temporary, will use actual art frames in images */
 .frame {
   padding: 4px;
   background: var(--white);
@@ -238,11 +229,13 @@ body {
   transform: translateY(-4px);
 }
 
-.frame img {
+/* the pixelated art (a tiny canvas stretched up, see makeSlot in script.js).
+   pixelated = keep the hard square edges when it's stretched, no blur */
+.frame canvas {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* crops to fit instead of stretching */
   display: block;
+  image-rendering: pixelated;
 }
 
 /* dashed "+" spot, only the owner sees these */
