@@ -180,7 +180,7 @@ function drawWord(svg, text) {
     drawPixels(group, rows, x);
     svg.appendChild(group);
 
-    x += rows[0].length + 2; // 2 pixel gap between letters
+    x += rows[0].length + 2;
   });
 
   svg.setAttribute("viewBox", "0 0 " + (x - 2) + " 13");
@@ -205,25 +205,22 @@ get("ticket-btn").onclick = () => {
     get("home").hidden = true;
     get("ticket-page").hidden = false;
 
-    // wait one frame so the fade in actually animates instead of just appearing
     requestAnimationFrame(() => {
       get("ticket-page").classList.add("shown");
     });
-  }, 700); // same as the fade time in home.css
+  }, 700);
 };
 
 
 /* ===== ticket details ===== */
 
-// stamps the ticket with the exact date + time the page was opened,
-// ex. "NOV 20, 2026" on top and "8:41 PM" under it
+// stamps the ticket with the exact date + time the page was opened
 const now = new Date();
 const month = now.toLocaleString("en-US", { month: "short" }).toUpperCase();
 const time = now.toLocaleString("en-US", { hour: "numeric", minute: "2-digit" });
 get("t-date").innerHTML = month + " " + now.getDate() + ", " + now.getFullYear() + "<br>" + time;
 
-// barcode: each number is how thick a bar is, bars alternate with gaps.
-// fixed pattern so it looks the same every time
+// Barcode drawing ya
 const BARCODE = "21131241312114213122131413211231142131";
 
 function drawBarcode() {
@@ -240,16 +237,15 @@ function drawBarcode() {
 drawBarcode();
 
 
-/* ===== tearing the ticket ===== */
+/* ===== ripping the ticket ===== */
 
 const ticket = get("ticket");
 const perf = get("perf");
-const fill = get("perf-fill");
 
 let dragging = false;
 let torn = false;
-let topY = null;    // highest point dragged over on the line
-let bottomY = null; // lowest point dragged over
+let topY = null;
+let bottomY = null;
 
 ticket.addEventListener("pointerdown", (e) => {
   if (torn) return;
@@ -270,7 +266,7 @@ ticket.addEventListener("pointercancel", () => {
   dragging = false;
 });
 
-// keyboard users can press enter/space on the dotted line instead
+// press enter/space on the dotted line instead
 perf.addEventListener("keydown", (e) => {
   if (e.key === "Enter" || e.key === " ") {
     e.preventDefault();
@@ -279,7 +275,6 @@ perf.addEventListener("keydown", (e) => {
 });
 
 // keeps track of how much of the dotted line has been dragged over.
-// it doesn't matter which direction, it just remembers the highest + lowest point
 function trackTear(e) {
   if (torn) return;
 
@@ -299,9 +294,9 @@ function trackTear(e) {
   topY = Math.min(topY, y);
   bottomY = Math.max(bottomY, y);
 
-  // gold line shows how far you've gotten
-  fill.style.top = topY + "px";
-  fill.style.height = (bottomY - topY) + "px";
+  // gold line shows how far you've gotten (drawn by .t-perf::after in home.css)
+  perf.style.setProperty("--fill-top", topY + "px");
+  perf.style.setProperty("--fill-height", (bottomY - topY) + "px");
 
   ticket.classList.add("started"); // hides the hint + demo cursor
 
@@ -315,8 +310,8 @@ function tearTicket() {
   torn = true;
   dragging = false;
 
-  fill.style.top = "0px";
-  fill.style.height = "100%";
+  perf.style.setProperty("--fill-top", "0px");
+  perf.style.setProperty("--fill-height", "100%");
   ticket.classList.add("started", "torn"); // stub drifts away (home.css)
 
   // let the stub finish fading, then fade the whole page out and go to the museum

@@ -66,8 +66,6 @@
 
     <!-- title + ticket button in the middle -->
     <div class="center">
-      <div class="blob"></div>
-
       <!-- "MY INTERNET" gets drawn in here as pixel art by home.js -->
       <svg class="wordmark" id="wordmark" role="img" aria-label="My Internet"></svg>
 
@@ -92,10 +90,9 @@
         <p class="t-big">GUEST PASS</p>
       </div>
 
-      <!-- picture spot. add <img src="assets/ticket.jpg" alt=""> in here later -->
+      <!-- picture spot (the two curved lines are drawn in home.css) -->
       <div class="t-image">
-        <span class="arc arc-left"></span>
-        <span class="arc arc-right"></span>
+        <!-- add <img src="assets/ticket.jpg" alt=""> here later -->
       </div>
 
       <div class="t-title">
@@ -103,10 +100,8 @@
         <p class="t-big">INTERNET<br>MUSEUM</p>
       </div>
 
-      <!-- the dotted line you drag along -->
+      <!-- the dotted line you drag along. the line + gold progress line are drawn in home.css -->
       <div class="t-perf" id="perf" tabindex="0" role="button" aria-label="Tear the ticket">
-        <span class="perf-line"></span>
-        <span class="perf-fill" id="perf-fill"></span>
         <svg class="pixel-cursor perf-cursor" id="perf-cursor" aria-hidden="true"></svg>
       </div>
 
@@ -115,16 +110,16 @@
         <div class="stub-text">
           <p class="t-date" id="t-date">NOV 20 &ndash;<br>FOREVER</p>
           <p class="t-logo"><span class="script-m">M</span>IM</p>
-          <p class="t-tag">FROM SCREEN TO WALL</p>
-          <p class="t-price">$0 (TAX INCLUDED)</p>
+          <p class="t-tag">My Internet MUSEUM</p>
+          <p class="t-price">$666 (dabloons included)</p>
         </div>
-        <div class="barcode" id="barcode"></div>
+        <div class="barcode" id="barcode">
+          <!-- bars get added by drawBarcode() in home.js -->
+        </div>
       </div>
 
-      <!-- instructions, styled like a selected text box in canva -->
+      <!-- instructions, styled like a selected text box in canva (corner handles are in home.css) -->
       <div class="select-box" id="tear-hint">
-        <span class="handle tl"></span><span class="handle tr"></span>
-        <span class="handle bl"></span><span class="handle br"></span>
         drag down the dotted line
       </div>
     </div>
