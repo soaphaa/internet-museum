@@ -8,10 +8,13 @@
   --maroon-dark: #4f0e19;
   --gold: #c4a052;
   --gold-light: #e2cf9f;
+  --gold-dark: #9c7a2e;  /* darker gold so the checkmarks are readable on white */
   --navy: #1d2741;
   --white: #ffffff;
   --paper: #f8f5f0;   /* home background, a warm white */
   --ticket: #fbf8f1;  /* ticket paper */
+  --muted: #8a8f9c;   /* grey for rules that aren't met yet */
+  --input-line: #cfd2da;
 
   /* same spacing scale as the museum page */
   --space-1: 8px;
@@ -273,14 +276,21 @@ body {
   background: var(--navy);
   display: grid;
   place-items: center;
-  opacity: 0; /* home.js adds .shown to fade it in */
 }
 
-#ticket-page.shown {
+/* pages 2 and 3 start see-through, home.js adds .shown to fade them in */
+#ticket-page,
+#account-page {
+  opacity: 0;
+}
+
+#ticket-page.shown,
+#account-page.shown {
   opacity: 1;
 }
 
-#ticket-page.shown.fading {
+#ticket-page.shown.fading,
+#account-page.shown.fading {
   opacity: 0;
 }
 
@@ -302,6 +312,23 @@ body {
 
 .ticket p {
   line-height: 1;
+}
+
+/* everything left of the dotted line, stays put when the stub tears */
+.t-main {
+  display: flex;
+  height: 100%;
+}
+
+/* pixel font for a few small bits of text on the ticket */
+.ticket .pixel {
+  font-family: var(--pixel);
+}
+
+/* username + museum name come from what people typed, so force caps here */
+#t-username,
+#t-museum {
+  text-transform: uppercase;
 }
 
 /* left strip, main part and stub all share the ticket paper */
@@ -474,8 +501,17 @@ body {
 
 .t-date {
   font-size: 1.05em;
-  line-height: 1.15 !important;
   letter-spacing: 0.04em;
+}
+
+/* date and time each get their own line */
+.t-date span {
+  display: block;
+}
+
+.t-time {
+  margin-top: 0.3em;
+  font-size: 0.85em;
 }
 
 .t-logo {
@@ -518,6 +554,38 @@ body {
 
 .barcode span.gap {
   background: transparent;
+}
+
+/* ===== drawn ticket art =====
+   when assets/ticket.png loads, home.js adds .has-art and sets --ticket-art.
+   the one image is spread across both halves: the main part shows the left 30.5em,
+   the stub shows the rest. all the drawn shapes get hidden, the text stays */
+.ticket.has-art .t-main,
+.ticket.has-art .t-stub {
+  background-color: transparent;
+  background-image: var(--ticket-art);
+  background-size: 46em 17em;
+  background-repeat: no-repeat;
+}
+
+.ticket.has-art .t-stub {
+  background-position: -30.5em 0;
+}
+
+.ticket.has-art .t-strip,
+.ticket.has-art .t-image,
+.ticket.has-art .t-title,
+.ticket.has-art .t-perf {
+  background: transparent;
+}
+
+.ticket.has-art .t-image::before,
+.ticket.has-art .t-image::after,
+.ticket.has-art .t-stub::before,
+.ticket.has-art .t-stub::after,
+.ticket.has-art .t-perf::before,
+.ticket.has-art .barcode {
+  display: none;
 }
 
 /* torn: stub slowly drifts off and fades away */
@@ -600,6 +668,264 @@ body {
 }
 
 
+/* ===== page 3: create account ===== */
+
+#account-page {
+  background: var(--paper);
+  display: grid;
+  place-items: center;
+  padding: var(--space-2);
+  overflow-y: auto; /* in case the card is taller than a small phone screen */
+}
+
+.account-card {
+  width: min(440px, 100%);
+  padding: var(--space-4);
+  background: var(--white);
+  border-radius: var(--space-3);
+  box-shadow: 0 20px 60px rgba(29, 39, 65, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-family: var(--times);
+  color: var(--navy);
+}
+
+/* maroon circle with the script M */
+.logo {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--maroon);
+  color: var(--white);
+  font-family: var(--script);
+  font-size: 40px;
+  line-height: 56px;
+  text-align: center;
+}
+
+.account-card h2 {
+  font-size: 30px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.subtitle {
+  margin-top: calc(var(--space-1) * -1); /* sits closer to the heading */
+  margin-bottom: var(--space-1);
+  font-size: 16px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* input boxes with the label that floats up onto the border */
+.field {
+  position: relative;
+}
+
+.field input {
+  width: 100%;
+  height: 56px;
+  padding: 0 var(--space-2);
+  border: 1.5px solid var(--input-line);
+  border-radius: 12px;
+  background: var(--white);
+  font-family: var(--times);
+  font-size: 17px;
+  color: var(--navy);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.field input:focus {
+  border-color: var(--navy);
+}
+
+.field label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  translate: 0 -50%;
+  padding: 0 4px;
+  background: var(--white); /* covers the border line behind the label */
+  font-size: 16px;
+  color: var(--muted);
+  pointer-events: none; /* clicks go through to the input */
+  transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease;
+}
+
+/* clicked into, or has text in it -> label moves up onto the border.
+   :placeholder-shown is only true when the box is empty, that's why placeholder=" " */
+.field input:focus + label,
+.field input:not(:placeholder-shown) + label {
+  top: 0;
+  font-size: 13px;
+  color: var(--navy);
+}
+
+/* room on the right of the password box for the eye */
+#su-password {
+  padding-right: 56px;
+}
+
+.eye-btn {
+  position: absolute;
+  right: var(--space-1);
+  top: 50%;
+  translate: 0 -50%;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.eye-btn:hover {
+  background: var(--paper);
+}
+
+.pixel-icon {
+  width: 22px;
+  fill: var(--navy);
+  shape-rendering: crispEdges;
+}
+
+/* password rules box. uses the pixel font like the other hints */
+.rules {
+  padding: var(--space-2);
+  border: 1px solid var(--input-line);
+  border-radius: 8px;
+  font-family: var(--pixel);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.rules ul {
+  padding: 0;
+  list-style: none;
+}
+
+.rules > ul {
+  margin-top: var(--space-1);
+}
+
+/* the 4 character types are indented under "at least 3 of the following" */
+.rules ul ul {
+  margin-top: var(--space-1);
+  padding-left: var(--space-3);
+}
+
+.rules li {
+  margin-top: var(--space-1);
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+.rules li::before {
+  content: "-";
+  display: inline-block;
+  width: var(--space-3);
+}
+
+/* rule met: navy text with a gold check */
+.rules li.ok {
+  color: var(--navy);
+}
+
+.rules li.ok::before {
+  content: "\2713"; /* checkmark */
+  color: var(--gold-dark);
+}
+
+.error {
+  font-size: 15px;
+  color: var(--maroon);
+  text-align: center;
+}
+
+/* hides the error line when it only has the comment in it */
+.error:empty {
+  display: none;
+}
+
+.continue-btn {
+  height: 56px;
+  margin-top: var(--space-1);
+  border: none;
+  border-radius: 999px;
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--times);
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.continue-btn:hover {
+  background: var(--maroon);
+}
+
+.continue-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  background: var(--navy);
+}
+
+.continue-btn:focus-visible,
+.eye-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* log in mode hides username, museum name and the password rules */
+.account-card.login .signup-only {
+  display: none;
+}
+
+.guest-btn {
+  height: 56px;
+  margin-top: calc(var(--space-1) * -1); /* sits a bit closer to continue */
+  border: 1.5px solid var(--input-line);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--navy);
+  font-family: var(--times);
+  font-size: 18px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.guest-btn:hover {
+  border-color: var(--navy);
+}
+
+.guest-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.switch {
+  font-size: 15px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* "Log in" / "Create an account" looks like a link but is a button */
+.link-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--maroon);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
 /* ===== phones ===== */
 
 @media (max-width: 720px) {
@@ -616,6 +942,10 @@ body {
 
   .center::before {
     inset: -40px -32px;
+  }
+
+  .account-card {
+    padding: var(--space-3);
   }
 }
 

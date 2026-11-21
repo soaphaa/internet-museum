@@ -1,0 +1,452 @@
+/*
+  Internet Wall styles
+  colours, spacing and room size are all variables up top
+  so the whole look can be changed from one spot
+*/
+
+:root {
+  /* palette: white base, light pink + sage, maroon for accents */
+  --white: #ffffff;
+  --pink: #f6e7e8;
+  --pink-deep: #ecd3d6;
+  --sage: #8a9c7a;
+  --sage-light: #dce4d3;
+  --maroon: #7b2c3a;
+  --maroon-dark: #5f1f2b; /* button hover */
+  --text: #2b2225;
+  --text-soft: #5b5054;
+  --line: rgba(43, 34, 37, 0.12); /* thin borders on inputs/buttons */
+
+  /* spacing scale. only use these for gaps + padding so everything lines up */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+
+  --radius: 16px;
+
+  /* room size: --w is how wide each wall is, --h is how tall */
+  --w: 300px;
+  --h: 230px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+/* without this, anything with display: flex ignores the hidden attribute */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  font-family: "DM Sans", system-ui, sans-serif;
+  color: var(--text);
+  background: var(--pink);
+  min-height: 100vh;
+}
+
+/* keyboard focus outline (only shows when tabbing, not clicking) */
+:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 2px;
+}
+
+
+/* ===== glass ===== */
+
+/* see-through white + blur = the frosted glass look.
+   only really shows when there's something behind it (the room) */
+.glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px); /* safari */
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(60, 30, 40, 0.08);
+}
+
+
+/* ===== buttons ===== */
+
+.btn {
+  font: inherit; /* buttons don't use the page font by default */
+  font-size: 14px;
+  font-weight: 500;
+  height: 40px;
+  padding: 0 var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px; /* pill shape */
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--text);
+  text-decoration: none; /* for the <a> that's styled like a button */
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn:hover {
+  background: var(--sage-light);
+}
+
+/* the main action on each screen */
+.btn-main {
+  background: var(--maroon);
+  border-color: var(--maroon);
+  color: var(--white);
+}
+
+.btn-main:hover {
+  background: var(--maroon-dark);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* restore/delete in the archive */
+.btn-small {
+  height: 32px;
+  font-size: 13px;
+}
+
+/* ===== top bar ===== */
+
+.topbar {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  right: var(--space-2);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  /* less padding on the right since the buttons already have their own */
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+}
+
+.topbar h1 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.topbar nav {
+  display: flex;
+  gap: var(--space-1);
+}
+
+
+/* ===== the room =====
+   not real 3d, it's 2 slanted walls + a squished square for the floor.
+   the numbers below are just isometric math:
+     0.577  = tan(30deg), how much the walls slant
+     1.4142 = square root of 2 (a square turned 45deg is this much wider)
+     0.7071 = half of that
+     0.2929 = 1 - 0.7071
+*/
+
+.scene {
+  min-height: 100vh;
+  display: grid;
+  place-items: center; /* centers the room on the page */
+  padding: 96px var(--space-2) var(--space-4); /* 96px top = room for the top bar */
+}
+
+.room {
+  position: relative;
+  width: calc(var(--w) * 2);
+  height: calc(var(--h) + var(--w) * 1.155);
+}
+
+.wall {
+  position: absolute;
+  z-index: 1; /* keeps walls above the floor where they overlap */
+  width: var(--w);
+  height: var(--h);
+  transform-origin: left top;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly; /* spreads the 3 frames out evenly */
+  padding: 0 var(--space-2);
+  border-bottom: var(--space-1) solid var(--pink-deep); /* baseboard */
+}
+
+/* left wall slants up to the right */
+.wall-left {
+  left: 0;
+  top: calc(var(--w) * 0.577);
+  background: var(--white);
+  transform: skewY(-30deg);
+}
+
+/* right wall slants down to the right, slightly darker so it looks like it's in shade */
+.wall-right {
+  left: var(--w);
+  top: 0;
+  background: #f4eeef;
+  transform: skewY(30deg);
+}
+
+/* square -> rotate 45deg -> squish it vertically = isometric floor */
+.floor {
+  position: absolute;
+  width: calc(var(--w) * 1.4142);
+  height: calc(var(--w) * 1.4142);
+  left: calc(var(--w) * 0.2929);
+  top: calc(var(--h) + var(--w) * 0.577 - var(--w) * 0.7071);
+  background: var(--sage-light);
+  transform: scaleY(0.577) rotate(45deg);
+}
+
+/* rug in the middle of the floor */
+.floor::before {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  background: var(--pink-deep);
+  border-radius: 12px;
+}
+
+
+/* ===== art on the walls ===== */
+
+/* frames and empty spots are the same size so nothing shifts around */
+.frame,
+.slot {
+  width: calc(var(--w) * 0.24);
+  aspect-ratio: 3 / 4;
+}
+
+/* maroon frame with a thin white mat inside */
+.frame {
+  padding: 4px;
+  background: var(--white);
+  border: 3px solid var(--maroon);
+  border-radius: 2px;
+  box-shadow: 0 4px 10px rgba(60, 30, 40, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+/* small lift on hover so you can tell it's clickable */
+.frame:hover {
+  transform: translateY(-4px);
+}
+
+.frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* crops to fit instead of stretching */
+  display: block;
+}
+
+/* dashed "+" spot, only the owner sees these */
+.slot-empty {
+  font: inherit;
+  font-size: 24px;
+  color: var(--sage);
+  background: transparent;
+  border: 2px dashed var(--sage);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.slot-empty:hover {
+  background: rgba(220, 228, 211, 0.6);
+}
+
+
+/* ===== forms ===== */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* label text sits above its input */
+label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+input,
+textarea {
+  font: inherit;
+  font-size: 15px;
+  color: var(--text);
+  height: 44px;
+  padding: 0 var(--space-2);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+textarea {
+  height: auto;
+  padding: var(--space-1) var(--space-2);
+  resize: vertical; /* sideways resizing breaks the layout */
+}
+
+input[type="file"] {
+  height: auto;
+  padding: var(--space-1) var(--space-2);
+}
+
+.error {
+  font-size: 14px;
+  color: var(--maroon);
+}
+
+/* hide error boxes when there's no error, otherwise they leave an empty gap */
+.error:empty {
+  display: none;
+}
+
+.note {
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+
+/* ===== popups ===== */
+
+dialog {
+  width: min(480px, calc(100% - var(--space-4)));
+  max-height: calc(100vh - var(--space-4) * 2);
+  margin: auto; /* needed because the * { margin: 0 } reset breaks dialog centering */
+  padding: var(--space-4);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.75); /* a bit less see-through than .glass so text is easy to read */
+}
+
+dialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* the dimmed blurry area behind a popup */
+dialog::backdrop {
+  background: rgba(60, 30, 40, 0.2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* stops long titles from running under the X button */
+dialog h2 {
+  padding-right: var(--space-4);
+}
+
+.close-btn {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#view-img {
+  width: 100%;
+  max-height: 60vh;
+  object-fit: contain; /* show the whole piece, no cropping here */
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.desc {
+  color: var(--text-soft);
+  line-height: 1.5;
+  white-space: pre-wrap; /* keeps line breaks from the description box */
+}
+
+.desc:empty {
+  display: none;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+
+/* ===== archive ===== */
+
+/* fits as many columns as it can, each at least 130px wide */
+.archive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--space-2);
+  overflow-y: auto;
+}
+
+.archive-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.archive-item img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--white);
+}
+
+/* long titles get cut off with "..." */
+.archive-item p {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* ===== phones =====
+   just shrinks the room. everything above is based on --w/--h
+   so the whole room (frames included) scales with it */
+@media (max-width: 720px) {
+  :root {
+    --w: 165px;
+    --h: 140px;
+  }
+
+  /* buttons wrap onto a second line instead of squishing */
+  .topbar {
+    flex-wrap: wrap;
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .topbar nav {
+    flex-wrap: wrap;
+  }
+
+  /* top bar is taller on phones, so push the room down more */
+  .scene {
+    padding-top: 160px;
+  }
+}

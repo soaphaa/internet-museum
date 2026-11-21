@@ -79,39 +79,118 @@
   </section>
 
 
-  <!-- ========== PAGE 2: the ticket ========== -->
+  <!-- ========== PAGE 2: log in / sign up / guest ========== -->
+  <section class="page" id="account-page" hidden>
+
+    <!-- one form for both. home.js adds the "login" class to switch to log in mode -->
+    <form class="account-card" id="account-form">
+      <div class="logo">M</div>
+
+      <h2 id="account-title">Create Your Account</h2>
+      <p class="subtitle" id="account-subtitle">Make an account to open your museum.</p>
+
+      <!--
+        floating labels: the label sits inside the box, then moves up onto the border
+        when you click in or type. placeholder=" " is needed for the css trick to work
+      -->
+      <div class="field">
+        <input id="acc-email" type="email" placeholder=" " required autocomplete="email">
+        <label for="acc-email">Email</label>
+      </div>
+
+      <div class="field signup-only">
+        <input id="acc-username" placeholder=" " required maxlength="20" autocomplete="off">
+        <label for="acc-username">Username</label>
+      </div>
+
+      <div class="field signup-only">
+        <input id="acc-museum" placeholder=" " maxlength="40" autocomplete="off">
+        <label for="acc-museum">Museum name (optional)</label>
+      </div>
+
+      <div class="field">
+        <input id="acc-password" type="password" placeholder=" " required autocomplete="new-password">
+        <label for="acc-password">Password</label>
+        <button type="button" class="eye-btn" id="eye-btn" aria-label="Show password">
+          <svg class="pixel-icon" id="eye-icon" aria-hidden="true"></svg>
+        </button>
+      </div>
+
+      <!-- password rules (sign up only). home.js adds the "ok" class as each one is met -->
+      <div class="rules signup-only">
+        <p>Your password must contain:</p>
+        <ul>
+          <li data-rule="length">At least 8 characters</li>
+          <li data-rule="mix">At least 3 of the following:
+            <ul>
+              <li data-rule="lower">Lowercase letters (a-z)</li>
+              <li data-rule="upper">Uppercase letters (A-Z)</li>
+              <li data-rule="number">Numbers (0-9)</li>
+              <li data-rule="special">Special characters (e.g. !@#$%^&amp;*)</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <p class="error" id="account-error" role="alert"><!-- filled in by home.js --></p>
+
+      <button type="submit" class="continue-btn" id="continue-btn" disabled>Continue</button>
+      <button type="button" class="guest-btn" id="guest-btn">Continue as guest</button>
+
+      <p class="switch">
+        <span id="switch-text">Already have an account?</span>
+        <button type="button" class="link-btn" id="switch-btn">Log in</button>
+      </p>
+    </form>
+
+  </section>
+
+
+  <!-- ========== PAGE 3: the ticket ========== -->
   <section class="page" id="ticket-page" hidden>
 
+    <!--
+      ticket art: if assets/ticket.png exists, it replaces all the drawn shapes
+      (gold strip, picture spot, curves, barcode, notches). the text stays on top.
+      the image should be 46 x 17 in shape, ex. 2300 x 850 px. see TICKET_ART in home.js
+    -->
     <div class="ticket" id="ticket">
 
-      <!-- coloured side strip, text reads sideways -->
-      <div class="t-strip">
-        <p class="t-small">ADMIT ONE</p>
-        <p class="t-big">GUEST PASS</p>
-      </div>
+      <!-- everything left of the dotted line. stays when the stub tears off -->
+      <div class="t-main">
 
-      <!-- picture spot (the two curved lines are drawn in home.css) -->
-      <div class="t-image">
-        <!-- add <img src="assets/ticket.jpg" alt=""> here later -->
-      </div>
+        <!-- side strip, text reads sideways -->
+        <div class="t-strip">
+          <p class="t-small pixel">ADMIT ONE</p>
+          <p class="t-big" id="t-username">GUEST</p>
+        </div>
 
-      <div class="t-title">
-        <p class="t-small">MY</p>
-        <p class="t-big">INTERNET<br>MUSEUM</p>
-      </div>
+        <!-- picture spot (the two curved lines are drawn in home.css) -->
+        <div class="t-image">
+          <!-- add <img src="assets/ticket-picture.jpg" alt=""> here if you want a photo -->
+        </div>
 
-      <!-- the dotted line you drag along. the line + gold progress line are drawn in home.css -->
-      <div class="t-perf" id="perf" tabindex="0" role="button" aria-label="Tear the ticket">
-        <svg class="pixel-cursor perf-cursor" id="perf-cursor" aria-hidden="true"></svg>
+        <div class="t-title">
+          <p class="t-small pixel">NOW SHOWING</p>
+          <p class="t-big" id="t-museum">UNTITLED</p>
+        </div>
+
+        <!-- the dotted line you drag along. the line + gold progress line are drawn in home.css -->
+        <div class="t-perf" id="perf" tabindex="0" role="button" aria-label="Tear the ticket">
+          <svg class="pixel-cursor perf-cursor" id="perf-cursor" aria-hidden="true"></svg>
+        </div>
       </div>
 
       <!-- the part that rips off -->
       <div class="t-stub" id="stub">
         <div class="stub-text">
-          <p class="t-date" id="t-date">NOV 20 &ndash;<br>FOREVER</p>
+          <p class="t-date">
+            <span id="t-date">NOV 21, 2026</span>
+            <span class="t-time pixel" id="t-time">10:30 AM</span>
+          </p>
           <p class="t-logo"><span class="script-m">M</span>IM</p>
           <p class="t-tag">My Internet MUSEUM</p>
-          <p class="t-price">$666 (dabloons included)</p>
+          <p class="t-price pixel">$666 (dabloons included)</p>
         </div>
         <div class="barcode" id="barcode">
           <!-- bars get added by drawBarcode() in home.js -->
@@ -126,6 +205,8 @@
 
   </section>
 
+  <!-- supabase library (login + database). has to load before home.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="home.js"></script>
 </body>
 </html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internet Wall</title>
+
+  <!-- DM Sans font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!--
+    everything starts hidden, script.js decides what to show
+    depending on if you're logged in / a guest / whose museum it is.
+    logging in + signing up happen on the home page (index.html) now
+  -->
+
+  <!-- top bar: museum name on the left, buttons on the right -->
+  <header class="topbar glass" id="topbar" hidden>
+    <h1 id="museum-title">Museum</h1>
+
+    <!-- only shows up on your own museum -->
+    <nav id="owner-tools" hidden>
+      <button class="btn btn-main" id="add-btn">Add art</button>
+      <button class="btn" id="archive-btn">Archive</button>
+      <button class="btn" id="copy-btn">Copy link</button>
+      <button class="btn" id="logout-btn">Log out</button>
+    </nav>
+
+    <!-- shows up when you're visiting someone else's -->
+    <nav id="visitor-tools" hidden>
+      <a class="btn btn-main" id="home-link" href="./">Make your own</a>
+    </nav>
+  </header>
+
+  <!-- the isometric room. the 3d look is all CSS (see "the room" in style.css) -->
+  <!-- frames get added into the two walls by renderWalls() in script.js -->
+  <main class="scene">
+    <div class="room">
+      <div class="wall wall-left" id="left-wall"><!-- frames added by renderWalls() --></div>
+      <div class="wall wall-right" id="right-wall"><!-- frames added by renderWalls() --></div>
+      <!-- the rug on the floor is drawn in style.css -->
+      <div class="floor"><!-- floor --></div>
+    </div>
+  </main>
+
+  <!-- popup when you click a piece on the wall -->
+  <dialog class="glass" id="view-dialog">
+    <button class="close-btn" data-close aria-label="Close">&times;</button>
+    <img id="view-img" alt="">
+    <h2 id="view-title"></h2>
+    <p class="desc" id="view-desc"><!-- description goes here --></p>
+
+    <!-- owner only -->
+    <div class="actions" id="view-actions" hidden>
+      <button class="btn" id="archive-piece-btn">Move to archive</button>
+    </div>
+  </dialog>
+
+  <!-- popup for uploading new art -->
+  <dialog class="glass" id="add-dialog">
+    <button class="close-btn" data-close aria-label="Close">&times;</button>
+    <h2>Add art</h2>
+
+    <form id="add-form">
+      <label>
+        Image
+        <!-- same file types the storage bucket allows in setup.sql -->
+        <input id="add-file" type="file" accept="image/png, image/jpeg, image/webp, image/gif" required>
+      </label>
+      <label>
+        Title
+        <input id="add-title" maxlength="80" required>
+      </label>
+      <label>
+        Description (optional)
+        <textarea id="add-desc" rows="3" maxlength="500"></textarea>
+      </label>
+      <p class="error" id="add-error"><!-- upload errors show here --></p>
+      <button class="btn btn-main" type="submit" id="add-submit">Save</button>
+    </form>
+  </dialog>
+
+  <!-- archive popup, renderArchive() fills in the grid -->
+  <dialog class="glass" id="archive-dialog">
+    <button class="close-btn" data-close aria-label="Close">&times;</button>
+    <h2>Archive</h2>
+    <p class="note" id="archive-empty">Nothing archived.</p>
+    <p class="error" id="archive-error"><!-- errors show here --></p>
+    <div class="archive-grid" id="archive-grid"><!-- filled by renderArchive() --></div>
+  </dialog>
+
+  <!-- warning for guests, shows once per tab after landing on the walls -->
+  <dialog class="glass" id="guest-dialog">
+    <h2>You're visiting as a guest</h2>
+    <!-- kept on one line because .desc keeps line breaks (for piece descriptions) -->
+    <p class="desc">Your art is only saved in this tab. If you close or delete this tab or window, everything in your museum will be gone. Make an account if you want to keep it.</p>
+    <div class="actions">
+      <button class="btn btn-main" id="guest-ok-btn">Got it</button>
+    </div>
+  </dialog>
+
+  <!-- supabase library (login, database, image storage). has to load before script.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>
